@@ -16,7 +16,7 @@ class UsersController < ApplicationController
 
   # Post /users/is_valid
   def is_valid
-    @user = User.where(:email => params[:email]).where.not(:id => @current_user.id).first
+    @user = User.where(:email => params[:email].downcase!).where.not(:id => @current_user.id).first
     if !@user.blank?
       msg = {
         id: @user.id, 
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      command = AuthenticateUser.call(user_params[:email], user_params[:password])
+      command = AuthenticateUser.call(user_params[:email].downcase!, user_params[:password])
       msg = {
         auth_token: command.result[:auth_token], 
         first_name: command.result[:user].first_name, 

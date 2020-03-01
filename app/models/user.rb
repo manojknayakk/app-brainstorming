@@ -5,9 +5,11 @@ class User < ApplicationRecord
   
   validates_presence_of :first_name, :last_name, :email, :password, :password_confirmation
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
-  validates :email, uniqueness: true
+  validates_uniqueness_of :email, :case_sensitive => false
   validates :password, confirmation: true
   validates :password, length: { in: 6..20 }
+  before_save { email.downcase! }
 
   has_secure_password
+
 end

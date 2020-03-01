@@ -92,8 +92,8 @@ class NotesController < ApplicationController
   # DELETE /notes/1
   def destroy
     notes_access = NotesAccess.where(:note_id => @note.id, :user_id => @current_user.id).first
-    if !notes_access.blank? && notes_access.role_id == Role.find_by_role_name("owner")
-      @note.delete_all
+    if !notes_access.blank? && notes_access.role_id == Role.find_by_role_name("owner").id
+      @note.destroy
     else
       render json: { error: 'Not Authorized' }, status: 401
     end
