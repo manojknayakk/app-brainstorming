@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  skip_before_action :authenticate_request, only: [:create]
   before_action :set_user, only: [:show, :update, :destroy]
 
   # GET /users
@@ -13,12 +14,39 @@ class UsersController < ApplicationController
     render json: @user
   end
 
+  # Post /users/is_valid
+  def is_valid
+    @user = User.where(:email => params[:email]).where.not(:id => @current_user.id).first
+    if !@user.blank?
+      msg = {
+        id: @user.id, 
+        first_name: @user.first_name, 
+        last_name: @user.last_name, 
+        email: @user.email,
+        is_valid: true
+      }
+      render json: msg
+    else
+      msg = {
+        is_valid: false
+      }
+      render json: msg
+    end
+  end
+
   # POST /users
   def create
     @user = User.new(user_params)
 
     if @user.save
-      render json: @user, status: :created, location: @user
+      command = AuthenticateUser.call(user_params[:email], user_params[:password])
+      msg = {
+        auth_token: command.result[:auth_token], 
+        first_name: command.result[:user].first_name, 
+        last_name: command.result[:user].last_name, 
+        email: command.result[:user].email
+      }
+      render json: msg, status: :created, location: @user
     else
       render json: @user.errors, status: :unprocessable_entity
     end
