@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      command = AuthenticateUser.call(user_params[:email].downcase!, user_params[:password])
+      command = AuthenticateUser.call(@user.email, user_params[:password])
       msg = {
         auth_token: command.result[:auth_token], 
         first_name: command.result[:user].first_name, 
