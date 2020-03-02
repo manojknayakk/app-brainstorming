@@ -8,7 +8,7 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, :case_sensitive => false
   validates :password, confirmation: true
   validates :password, length: { in: 6..20 }
-  before_save { email.downcase! }
+  before_save { self.email = self.email.downcase }
 
   has_secure_password
 
